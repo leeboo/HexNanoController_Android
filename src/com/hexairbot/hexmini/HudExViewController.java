@@ -189,7 +189,7 @@ public class HudExViewController extends ViewController
     private SurfaceView videoStageHard = null;
     
     private LocalBroadcastManager mLocalBroadcastManager;
-    
+    private ConnectStateManager mConnectStateManager;
     private IpcProxy ipcProxy;
     
     private boolean isStartRecord = false;
@@ -266,7 +266,7 @@ public class HudExViewController extends ViewController
 		 
 		mainFrameLayout.addView(glView);
 		
-		ConnectStateManager mConnectStateManager = ConnectStateManager
+		mConnectStateManager = ConnectStateManager
 				.getInstance(HexMiniApplication.sharedApplicaion());
 		ipcProxy = mConnectStateManager.getIpcProxy();
 		
@@ -1084,6 +1084,10 @@ public class HudExViewController extends ViewController
 			glView.onPause();
 		}
 		
+		if (ipcProxy != null) {
+			ipcProxy.doPause();
+		}
+		
 		deviceOrientationManager.pause();
 	}
 	
@@ -1132,7 +1136,11 @@ public class HudExViewController extends ViewController
 	    renderer.clearSprites();
 	    deviceOrientationManager.destroy();
 	    unregisterAllBroadcastReceiver();
-	    this.context.unbindService(mConnection);
+	    this.context.unbindService(mConnection);    
+	    mConnectStateManager.destroy();
+	    if (mSoundPool != null) {
+		    mSoundPool.release();
+	    }
 	}
 
 	public boolean onDown(MotionEvent e) 
