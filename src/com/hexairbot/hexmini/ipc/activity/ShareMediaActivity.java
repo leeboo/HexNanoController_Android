@@ -48,13 +48,15 @@ public class ShareMediaActivity extends Activity implements OnTouchListener{
 	private Matrix savedMatrix = new Matrix();
     static final int NONE = 0; 	
     static final int DRAG = 1; 	
-    static final int ZOOM = 2; 	
+    static final int ZOOM = 2;
     int mode = NONE; 
     PointF start = new PointF(); 
     PointF mid = new PointF(); 
     float oldDist = 1f; 
 	private DisplayMetrics dm;
-    
+	private float max_scale_times = 5;
+	private float min_scale_times = 0.3f;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -275,10 +277,15 @@ public class ShareMediaActivity extends Activity implements OnTouchListener{
 		             if (newDist > 10) {
 		                 matrix.set(savedMatrix);
 		                 float scale = newDist/oldDist;
-		                 matrix.postScale(scale, scale, mid.x, mid.y);              
-		                 		
+		                 matrix.postScale(scale, scale, mid.x, mid.y);
+		                 float[] values = new float[9];
+		                 matrix.getValues(values);
+		                 if (values[0] > max_scale_times) {
+		                	 matrix.setScale(max_scale_times, max_scale_times, mid.x, mid.y);
+		                 } else if (values[0] < min_scale_times) {
+		                	 matrix.setScale(min_scale_times, min_scale_times, mid.x, mid.y);
+		                 }  
 		             }
-		
 		         }
 		
 		         break;
